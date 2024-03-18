@@ -29,7 +29,7 @@ func DependencyTreeCmd() error {
 		return errorutils.CheckError(err)
 	}
 
-	sol, err := solution.Load(workspace, "", log.Logger)
+	sol, err := solution.Load(workspace, "", "", log.Logger) // TODO: Gernot reset, just had to fulfill the method signature to build again, I did not want to change anything here.
 	if err != nil {
 		return err
 	}

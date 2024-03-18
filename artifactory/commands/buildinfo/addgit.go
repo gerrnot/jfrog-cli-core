@@ -1,6 +1,7 @@
 package buildinfo
 
 import (
+	"bufio"
 	"errors"
 	"io"
 	"os"
@@ -29,6 +30,11 @@ const (
 	ConfigIssuesPrefix        = "issues."
 	ConfigParseValueError     = "Failed parsing %s from configuration file: %s"
 	MissingConfigurationError = "Configuration file must contain: %s"
+	// GitCommitMessageSeparator
+	// Only internal usage, not user-visible.
+	// Separates commit messages (git log outputs from each other, such that splitting by this string) produces
+	// the full multiline commit messages, assuming that the user will not include this separator in commit messages
+	GitCommitMessageSeparator = "<iNtErNalCoMmItSePaRaToR>"
 )
 
 type BuildAddGitCommand struct {
@@ -470,7 +476,7 @@ type LogCmd struct {
 func (logCmd *LogCmd) GetCmd() *exec.Cmd {
 	var cmd []string
 	cmd = append(cmd, "git")
-	cmd = append(cmd, "log", "--pretty=format:%s", "-"+strconv.Itoa(logCmd.logLimit))
+	cmd = append(cmd, "log", "--pretty=format:%B"+GitCommitMessageSeparator, "-"+strconv.Itoa(logCmd.logLimit))
 	if logCmd.lastVcsRevision != "" {
 		cmd = append(cmd, logCmd.lastVcsRevision+"..")
 	}
@@ -488,3 +494,5 @@ func (logCmd *LogCmd) GetStdWriter() io.WriteCloser {
 func (logCmd *LogCmd) GetErrWriter() io.WriteCloser {
 	return nil
 }
+
+func (LogCmd *LogCmd) Split() bufio.SplitFunc { return gofrogcmd.SplitAt(GitCommitMessageSeparator) }
