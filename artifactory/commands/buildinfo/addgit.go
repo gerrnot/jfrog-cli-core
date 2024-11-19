@@ -187,14 +187,8 @@ func (config *BuildAddGitCommand) collectBuildIssues(vcsUrl string) ([]buildinfo
 		return nil, err
 	}
 
-	// Get latest build's VCS revision from Artifactory.
-	lastVcsRevision, err := config.getLatestVcsRevision(vcsUrl)
-	if err != nil {
-		return nil, err
-	}
-
 	// Run issues collection.
-	return config.DoCollect(config.issuesConfig, lastVcsRevision)
+	return config.DoCollect(config.issuesConfig, "")
 }
 
 func (config *BuildAddGitCommand) DoCollect(issuesConfig *IssuesConfiguration, lastVcsRevision string) (foundIssues []buildinfo.AffectedIssue, err error) {
